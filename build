@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# check if sudo is required and save the result as ${PFX}:
 [[ ${EUID} -ne 0 ]] && PFX='sudo ' || PFX=''
 
 check_make_ok() {
@@ -87,19 +86,20 @@ check_make_ok
 ${PFX}make install
 check_make_ok
 
-# echo
-# echo "Examples"
-# cd ../examples
-# make
-# cd ..
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+SYS_INFO_SRC="${SCRIPT_DIR}/sys_info"
+SYS_INFO_DEST="/etc/sys_info"
 
 echo
-echo All Done.
-echo ""
-echo "NOTE: To compile programs with wiringNP, you need to add:"
-echo "    -lwiringPi"
-# echo "  to your compile line(s) To use the Gertboard, MaxDetect, etc."
-# echo "  code (the devLib), you need to also add:"
-# echo "    -lwiringPiDev"
-echo "  to your compile line(s)."
-echo ""
+echo "Attempting to copy sys_info to ${SYS_INFO_DEST}..."
+
+if [ -f "${SYS_INFO_SRC}" ]; then
+  ${PFX}cp "${SYS_INFO_SRC}" "${SYS_INFO_DEST}"
+  if [ $? -eq 0 ]; then
+    echo "sys_info copied successfully to ${SYS_INFO_DEST}"
+  else
+    echo "Failed to copy sys_info to ${SYS_INFO_DEST}. Please check permissions."
+  fi
+else
+  echo "Error: sys_info not found at ${SYS_INFO_SRC}. Skipping copy."
+fi
